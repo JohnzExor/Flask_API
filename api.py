@@ -9,6 +9,7 @@ app.config["MYSQL_DB"] = "rest_db"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 mysql = MySQL(app)
 
+#GET
 def get_fetch(query):
     cur = mysql.connection.cursor()
     cur.execute(query)
@@ -16,18 +17,17 @@ def get_fetch(query):
     cur.close()
     return data
 
-#GET
 @app.route("/tables", methods=["GET"])
 def show_tables():
-    return make_response(jsonify(get_fetch("show tables")))
+    return make_response(jsonify(get_fetch("show tables")), 200)
 
 @app.route("/tables/<string:table>", methods=["GET"])
 def select_table(table):
-    return make_response(jsonify(get_fetch(f"select * from {table}")))
+    return make_response(jsonify(get_fetch(f"select * from {table}")), 200)
 
 @app.route("/tables/<string:table>/<int:id>", methods=["GET"])
 def select_id(table, id):
-    return make_response(jsonify(get_fetch(f"select * from {table} where id='{id}'")))
+    return make_response(jsonify(get_fetch(f"select * from {table} where id='{id}'")), 200)
 
 #POST
 @app.route("/tables/students/add/<int:id>", methods=["POST"])
@@ -42,8 +42,18 @@ def add_student(id):
     mysql.connection.commit()
     row_changes = cur.rowcount
     cur.close()
-    return make_response(jsonify({"Message": "Added Succesfully", "Row changes": row_changes}))
+    return make_response(jsonify({"Message": "Added Succesfully", "Row changes": row_changes}), 201)
 
+#DELETE
+@app.route("/tables/students/delete/<int:id>", methods=["DELETE"])
+def delete_student(id):
+    cur = mysql.connection.cursor()
+    query = "delete from students where id=%s"
+    cur.execute(query, (id,))
+    mysql.connection.commit()
+    row_changes = cur.rowcount
+    cur.close()
+    return make_response(jsonify({"Message": "Has been deleted successfully", "Row changes": row_changes}), 200)
 
 
 
