@@ -30,7 +30,7 @@ def select_id(table, id):
     return make_response(jsonify(get_fetch(f"select * from {table} where id='{id}'")), 200)
 
 #POST
-@app.route("/tables/students/add/<int:id>", methods=["POST"])
+@app.route("/tables/students/<int:id>", methods=["POST"])
 def add_student(id):
     cur = mysql.connection.cursor()
     info = request.get_json()
@@ -45,7 +45,7 @@ def add_student(id):
     return make_response(jsonify({"Message": "Added Succesfully", "Row changes": row_changes}), 201)
 
 #DELETE
-@app.route("/tables/students/delete/<int:id>", methods=["DELETE"])
+@app.route("/tables/students/<int:id>", methods=["DELETE"])
 def delete_student(id):
     cur = mysql.connection.cursor()
     query = "delete from students where id=%s"
@@ -55,6 +55,20 @@ def delete_student(id):
     cur.close()
     return make_response(jsonify({"Message": "Has been deleted successfully", "Row changes": row_changes}), 200)
 
+#PUT
+@app.route("/tables/students/<int:id>", methods=["PUT"])
+def update_student(id):
+    cur = mysql.connection.cursor()
+    info = request.get_json()
+    last_name = info["last_name"]
+    first_name = info["first_name"]
+    subjects_id = info["subjects_id"]
+    query = "update students set lastname=%s, firstname=%s, subjects_id=%s where id=%s"
+    cur.execute(query, (last_name, first_name, subjects_id, id,))
+    mysql.connection.commit()
+    row_changes = cur.rowcount
+    cur.close()
+    return make_response(jsonify({"Message": "PUT Success", "Row changes": row_changes}))
 
 
 if __name__ == "__main__":
