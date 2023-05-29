@@ -20,7 +20,7 @@ def api_key_required(f):
     def decorated_function(*args, **kwargs):
         api_key = request.headers.get("API-Key")
         if api_key != app.config["API_KEY"]:
-            abort(401)  # Unauthorized
+            abort(401)
         return f(*args, **kwargs)
     return decorated_function
 
